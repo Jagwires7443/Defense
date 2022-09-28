@@ -126,9 +126,45 @@ void Robot::TeleopInit()
 // values as inputs to the ArcadeDrive() method of DifferentialDrive.
 void Robot::TeleopPeriodic()
 {
-  m_robotDrive.ArcadeDrive(
-      m_controller.GetLeftY(),
-      m_controller.GetLeftX());
+  double x = -m_controller.GetLeftY();
+  double y = +m_controller.GetLeftX();
+  bool turbo = m_controller.GetLeftBumper() || m_controller.GetRightBumper();
+
+  auto shape = [](double raw, double mixer = 0.75) -> double
+  {
+    // Input deadband around 0.0 (+/- range).
+    constexpr double range = 0.05;
+
+    constexpr double slope = 1.0 / (1.0 - range);
+
+    if (raw >= -range && raw <= +range)
+    {
+      raw = 0.0;
+    }
+    else if (raw < -range)
+    {
+      raw += range;
+      raw *= slope;
+    }
+    else if (raw > +range)
+    {
+      raw -= range;
+      raw *= slope;
+    }
+
+    return mixer * std::pow(raw, 3.0) + (1.0 - mixer) * raw;
+  };
+
+  x = shape(x);
+  y = shape(y);
+
+  if (!turbo)
+  {
+    x *= 0.8;
+    y *= 0.8;
+  }
+
+  m_robotDrive.ArcadeDrive(x, y);
 }
 
 void Robot::DisabledInit() {}
