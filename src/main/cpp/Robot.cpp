@@ -158,6 +158,7 @@ void Robot::TeleopPeriodic()
   x = shape(x);
   y = shape(y);
 
+  // Limit to 80%, unless turbo button is held.
   if (!turbo)
   {
     x *= 0.8;

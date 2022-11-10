@@ -10,7 +10,6 @@
 // used to bring in the necessary information to make use of these two types of
 // motor controller.  The company that develops these is "CTRE" (Cross The Road
 // Electronics), and the coding framework they offer is known as "Phoenix".
-#include <ctre/phoenix/motorcontrol/can/WPI_TalonSRX.h>
 #include <ctre/phoenix/motorcontrol/can/WPI_VictorSPX.h>
 
 // The next three lines are used to bring in the necessary information to use
@@ -31,10 +30,10 @@ class Robot : public frc::TimedRobot
   // controllers (left and right drivetrain, A and B motors).  The number (1-4)
   // at the end of each line gives the "CAN ID" which matches that configured
   // into the corresponding motor controller.
-  ctre::phoenix::motorcontrol::can::WPI_TalonSRX m_rightMotorA{3};
-  ctre::phoenix::motorcontrol::can::WPI_TalonSRX m_rightMotorB{4};
   ctre::phoenix::motorcontrol::can::WPI_VictorSPX m_leftMotorA{1};
   ctre::phoenix::motorcontrol::can::WPI_VictorSPX m_leftMotorB{2};
+  ctre::phoenix::motorcontrol::can::WPI_VictorSPX m_rightMotorA{3};
+  ctre::phoenix::motorcontrol::can::WPI_VictorSPX m_rightMotorB{4};
 
   // This resource does not correspond to any specific piece(s) of hardware but
   // instead, is composed of other already defined resources (above).  Thus, it
