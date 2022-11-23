@@ -22,6 +22,9 @@ void Robot::RobotInit()
   m_rightMotorA.ConfigFactoryDefault();
   m_leftMotorB.ConfigFactoryDefault();
   m_rightMotorB.ConfigFactoryDefault();
+
+  m_Compressor.EnableDigital();
+  m_Solenoid.Set(frc::DoubleSolenoid::kOff);
 }
 
 // This doesn't do anything, but provides a place to add code as neeeded.
@@ -54,6 +57,8 @@ void Robot::TestPeriodic()
   const bool buttonB = m_controller.GetBButton();
   const bool buttonX = m_controller.GetXButton();
   const bool buttonY = m_controller.GetYButton();
+  const bool flag_up = m_controller.GetLeftBumper();
+  const bool flag_down = m_controller.GetRightBumper();
 
   if (buttonA)
   {
@@ -89,6 +94,19 @@ void Robot::TestPeriodic()
   else
   {
     m_rightMotorB.StopMotor();
+  }
+
+  if (flag_up)
+  {
+    m_Solenoid.Set(frc::DoubleSolenoid::kForward);
+  }
+  else if (flag_down)
+  {
+    m_Solenoid.Set(frc::DoubleSolenoid::kReverse);
+  }
+  else
+  {
+    m_Solenoid.Set(frc::DoubleSolenoid::kOff);
   }
 }
 

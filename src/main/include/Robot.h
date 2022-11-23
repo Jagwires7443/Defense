@@ -21,6 +21,9 @@
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
 
+#include <frc/Compressor.h>
+#include <frc/DoubleSolenoid.h>
+
 // The general outine of this "class" is defined in the "TimedRobot" include.
 class Robot : public frc::TimedRobot
 {
@@ -41,6 +44,9 @@ class Robot : public frc::TimedRobot
   // this drive base only directly uses two motor controllers, some other means
   // is going to be used to bring in the other two motor controllers.
   frc::DifferentialDrive m_robotDrive{m_leftMotorA, m_rightMotorA};
+
+  frc::Compressor m_Compressor{frc::PneumaticsModuleType::CTREPCM};
+  frc::DoubleSolenoid m_Solenoid{frc::PneumaticsModuleType::CTREPCM, 0, 1};
 
   // This resource corresponds to the game controller that is attached to the
   // driver station; this is how operator controls are tied into the robot code
