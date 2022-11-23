@@ -146,7 +146,9 @@ void Robot::TeleopPeriodic()
 {
   double x = -m_controller.GetLeftY();
   double y = +m_controller.GetLeftX();
-  bool turbo = m_controller.GetLeftBumper() || m_controller.GetRightBumper();
+  const bool turbo = m_controller.GetLeftBumper() || m_controller.GetRightBumper();
+  const bool flag_up = m_controller.GetXButton();
+  const bool flag_down = m_controller.GetYButton();
 
   auto shape = [](double raw, double mixer = 0.75) -> double
   {
@@ -184,6 +186,19 @@ void Robot::TeleopPeriodic()
   }
 
   m_robotDrive.ArcadeDrive(x, y);
+
+  if (flag_up)
+  {
+    m_Solenoid.Set(frc::DoubleSolenoid::kForward);
+  }
+  else if (flag_down)
+  {
+    m_Solenoid.Set(frc::DoubleSolenoid::kReverse);
+  }
+  else
+  {
+    m_Solenoid.Set(frc::DoubleSolenoid::kOff);
+  }
 }
 
 void Robot::DisabledInit() {}
