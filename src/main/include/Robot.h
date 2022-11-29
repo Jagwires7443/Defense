@@ -46,7 +46,7 @@ class Robot : public frc::TimedRobot
   frc::DifferentialDrive m_robotDrive{m_leftMotorA, m_rightMotorA};
 
   frc::Compressor m_Compressor{frc::PneumaticsModuleType::CTREPCM};
-  frc::DoubleSolenoid m_Solenoid{frc::PneumaticsModuleType::CTREPCM, 0, 1};
+  frc::DoubleSolenoid m_Solenoid{frc::PneumaticsModuleType::CTREPCM, 2, 3};
 
   // This resource corresponds to the game controller that is attached to the
   // driver station; this is how operator controls are tied into the robot code
