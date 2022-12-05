@@ -18,6 +18,8 @@ using ctre::phoenix::motorcontrol::NeutralMode;
 // including any configuration set and saved using the "PhoenixTuner" utility).
 void Robot::RobotInit()
 {
+  m_camera = frc::CameraServer::StartAutomaticCapture("USB Camera 0", 0);
+
   m_leftMotorA.ConfigFactoryDefault();
   m_rightMotorA.ConfigFactoryDefault();
   m_leftMotorB.ConfigFactoryDefault();

@@ -4,6 +4,9 @@
 
 #pragma once
 
+// Needed for USB camera.
+#include <cameraserver/CameraServer.h>
+
 // Testbot has two different types of motor controller: TalonSRX and VictorSPX.
 // Both of these are electrically connected via the CAN bus, and are being used
 // in the context of the FRC "WPILib" coding framework.  The next two lines are
@@ -37,6 +40,8 @@ class Robot : public frc::TimedRobot
   ctre::phoenix::motorcontrol::can::WPI_VictorSPX m_leftMotorB{2};
   ctre::phoenix::motorcontrol::can::WPI_VictorSPX m_rightMotorA{3};
   ctre::phoenix::motorcontrol::can::WPI_VictorSPX m_rightMotorB{4};
+
+  cs::UsbCamera m_camera;
 
   // This resource does not correspond to any specific piece(s) of hardware but
   // instead, is composed of other already defined resources (above).  Thus, it
