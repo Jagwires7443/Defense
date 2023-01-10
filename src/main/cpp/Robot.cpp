@@ -32,8 +32,123 @@ void Robot::RobotInit()
   m_Solenoid.Set(frc::DoubleSolenoid::kOff);
 }
 
+/**
+ * This function is called every 20 ms, no matter the mode. Use
+ * this for items like diagnostics that you want to run during disabled,
+ * autonomous, teleoperated and test.
+ *
+ * <p> This runs after the mode specific periodic functions, but before
+ * LiveWindow and SmartDashboard integrated updating.
+ */
 // This doesn't do anything, but provides a place to add code as neeeded.
 void Robot::RobotPeriodic() {}
+
+/**
+ * This function is called once each time the robot enters Disabled mode. You
+ * can use it to reset any subsystem information you want to clear when the
+ * robot is disabled.
+ */
+void Robot::DisabledInit() {}
+
+void Robot::DisabledPeriodic() {}
+
+/**
+ * This autonomous runs the autonomous command selected by your {@link
+ * RobotContainer} class.
+ */
+// Much as in TestInit(), both AutonomousInit() and TeleopInit() handle setting
+// the right side motor controllers to flip forward and reverse.  Also, this is
+// where the two motor controllers on each side are made to act as one, using a
+// mechanism known as "Follow".
+void Robot::AutonomousInit()
+{
+  m_leftMotorB.Follow(m_leftMotorA);
+  m_rightMotorB.Follow(m_rightMotorA);
+
+  m_leftMotorA.SetInverted(InvertType::None);
+  m_rightMotorA.SetInverted(InvertType::InvertMotorOutput);
+  m_leftMotorB.SetInverted(InvertType::FollowMaster);
+  m_rightMotorB.SetInverted(InvertType::FollowMaster);
+}
+
+// Right now, the robot does not do anything at all in autonomous mode.
+void Robot::AutonomousPeriodic() {}
+
+// See the comments in AutonomousInit() -- this is the same code.
+void Robot::TeleopInit()
+{
+  m_leftMotorB.Follow(m_leftMotorA);
+  m_rightMotorB.Follow(m_rightMotorA);
+
+  m_leftMotorA.SetInverted(InvertType::None);
+  m_rightMotorA.SetInverted(InvertType::InvertMotorOutput);
+  m_leftMotorB.SetInverted(InvertType::FollowMaster);
+  m_rightMotorB.SetInverted(InvertType::FollowMaster);
+}
+
+/**
+ * This function is called periodically during operator control.
+ */
+// This code handles teleop mode, using the game controller left joystick
+// values as inputs to the ArcadeDrive() method of DifferentialDrive.
+void Robot::TeleopPeriodic()
+{
+  double x = -m_controller.GetLeftY();
+  double y = +m_controller.GetLeftX();
+  const bool turbo = m_controller.GetLeftBumper() || m_controller.GetRightBumper();
+  const bool flag_up = m_controller.GetXButton();
+  const bool flag_down = m_controller.GetYButton();
+
+  auto shape = [](double raw, double mixer = 0.75) -> double
+  {
+    // Input deadband around 0.0 (+/- range).
+    constexpr double range = 0.05;
+
+    constexpr double slope = 1.0 / (1.0 - range);
+
+    if (raw >= -range && raw <= +range)
+    {
+      raw = 0.0;
+    }
+    else if (raw < -range)
+    {
+      raw += range;
+      raw *= slope;
+    }
+    else if (raw > +range)
+    {
+      raw -= range;
+      raw *= slope;
+    }
+
+    return mixer * std::pow(raw, 3.0) + (1.0 - mixer) * raw;
+  };
+
+  x = shape(x);
+  y = shape(y);
+
+  // Limit to 80%, unless turbo button is held.
+  if (!turbo)
+  {
+    x *= 0.8;
+    y *= 0.8;
+  }
+
+  m_robotDrive.ArcadeDrive(x, y);
+
+  if (flag_up)
+  {
+    m_Solenoid.Set(frc::DoubleSolenoid::kForward);
+  }
+  else if (flag_down)
+  {
+    m_Solenoid.Set(frc::DoubleSolenoid::kReverse);
+  }
+  else
+  {
+    m_Solenoid.Set(frc::DoubleSolenoid::kOff);
+  }
+}
 
 // This sets the two motor controllers on the right side of the robot so they
 // run in the opposite direction.  This is needed because of the physical
@@ -114,101 +229,6 @@ void Robot::TestPeriodic()
     m_Solenoid.Set(frc::DoubleSolenoid::kOff);
   }
 }
-
-// Much as in TestInit(), both AutonomousInit() and TeleopInit() handle setting
-// the right side motor controllers to flip forward and reverse.  Also, this is
-// where the two motor controllers on each side are made to act as one, using a
-// mechanism known as "Follow".
-void Robot::AutonomousInit()
-{
-  m_leftMotorB.Follow(m_leftMotorA);
-  m_rightMotorB.Follow(m_rightMotorA);
-
-  m_leftMotorA.SetInverted(InvertType::None);
-  m_rightMotorA.SetInverted(InvertType::InvertMotorOutput);
-  m_leftMotorB.SetInverted(InvertType::FollowMaster);
-  m_rightMotorB.SetInverted(InvertType::FollowMaster);
-}
-
-// Right now, the robot does not do anything at all in autonomous mode.
-void Robot::AutonomousPeriodic() {}
-
-// See the comments in AutonomousInit() -- this is the same code.
-void Robot::TeleopInit()
-{
-  m_leftMotorB.Follow(m_leftMotorA);
-  m_rightMotorB.Follow(m_rightMotorA);
-
-  m_leftMotorA.SetInverted(InvertType::None);
-  m_rightMotorA.SetInverted(InvertType::InvertMotorOutput);
-  m_leftMotorB.SetInverted(InvertType::FollowMaster);
-  m_rightMotorB.SetInverted(InvertType::FollowMaster);
-}
-
-// This code handles teleop mode, using the game controller left joystick
-// values as inputs to the ArcadeDrive() method of DifferentialDrive.
-void Robot::TeleopPeriodic()
-{
-  double x = -m_controller.GetLeftY();
-  double y = +m_controller.GetLeftX();
-  const bool turbo = m_controller.GetLeftBumper() || m_controller.GetRightBumper();
-  const bool flag_up = m_controller.GetXButton();
-  const bool flag_down = m_controller.GetYButton();
-
-  auto shape = [](double raw, double mixer = 0.75) -> double
-  {
-    // Input deadband around 0.0 (+/- range).
-    constexpr double range = 0.05;
-
-    constexpr double slope = 1.0 / (1.0 - range);
-
-    if (raw >= -range && raw <= +range)
-    {
-      raw = 0.0;
-    }
-    else if (raw < -range)
-    {
-      raw += range;
-      raw *= slope;
-    }
-    else if (raw > +range)
-    {
-      raw -= range;
-      raw *= slope;
-    }
-
-    return mixer * std::pow(raw, 3.0) + (1.0 - mixer) * raw;
-  };
-
-  x = shape(x);
-  y = shape(y);
-
-  // Limit to 80%, unless turbo button is held.
-  if (!turbo)
-  {
-    x *= 0.8;
-    y *= 0.8;
-  }
-
-  m_robotDrive.ArcadeDrive(x, y);
-
-  if (flag_up)
-  {
-    m_Solenoid.Set(frc::DoubleSolenoid::kForward);
-  }
-  else if (flag_down)
-  {
-    m_Solenoid.Set(frc::DoubleSolenoid::kReverse);
-  }
-  else
-  {
-    m_Solenoid.Set(frc::DoubleSolenoid::kOff);
-  }
-}
-
-void Robot::DisabledInit() {}
-
-void Robot::DisabledPeriodic() {}
 
 // This part is boilerplate that came in when the project was generated and can
 // just be ignored.

@@ -7,10 +7,10 @@
 // Needed for USB camera.
 #include <cameraserver/CameraServer.h>
 
-// Testbot has two different types of motor controller: TalonSRX and VictorSPX.
+// Testbot uses VictorSPX motor controllers.  These need to be the "WPI" variant.
 // Both of these are electrically connected via the CAN bus, and are being used
-// in the context of the FRC "WPILib" coding framework.  The next two lines are
-// used to bring in the necessary information to make use of these two types of
+// in the context of the FRC "WPILib" coding framework.  The next line is
+// used to bring in the necessary information to make use of this two type of
 // motor controller.  The company that develops these is "CTRE" (Cross The Road
 // Electronics), and the coding framework they offer is known as "Phoenix".
 #include <ctre/phoenix/motorcontrol/can/WPI_VictorSPX.h>
@@ -24,6 +24,7 @@
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
 
+// The next two lines are for pneumatics.
 #include <frc/Compressor.h>
 #include <frc/DoubleSolenoid.h>
 
@@ -41,6 +42,7 @@ class Robot : public frc::TimedRobot
   ctre::phoenix::motorcontrol::can::WPI_VictorSPX m_rightMotorA{3};
   ctre::phoenix::motorcontrol::can::WPI_VictorSPX m_rightMotorB{4};
 
+  // USB webcam, through roboRIO.
   cs::UsbCamera m_camera;
 
   // This resource does not correspond to any specific piece(s) of hardware but
@@ -67,14 +69,14 @@ public:
   // run in all modes, before the mode-specific methods for any mode.
   void RobotInit() override;
   void RobotPeriodic() override;
+  void DisabledInit() override;
+  void DisabledPeriodic() override;
   void AutonomousInit() override;
   void AutonomousPeriodic() override;
   void TeleopInit() override;
   void TeleopPeriodic() override;
-  void DisabledInit() override;
-  void DisabledPeriodic() override;
   void TestInit() override;
   void TestPeriodic() override;
-
-private:
+  void SimulationInit() override {}
+  void SimulationPeriodic() override {}
 };
