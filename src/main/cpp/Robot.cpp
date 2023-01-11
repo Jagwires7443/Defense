@@ -40,7 +40,6 @@ void Robot::RobotInit()
  * <p> This runs after the mode specific periodic functions, but before
  * LiveWindow and SmartDashboard integrated updating.
  */
-// This doesn't do anything, but provides a place to add code as neeeded.
 void Robot::RobotPeriodic() {}
 
 /**
@@ -52,14 +51,10 @@ void Robot::DisabledInit() {}
 
 void Robot::DisabledPeriodic() {}
 
-/**
- * This autonomous runs the autonomous command selected by your {@link
- * RobotContainer} class.
- */
 // Much as in TestInit(), both AutonomousInit() and TeleopInit() handle setting
 // the right side motor controllers to flip forward and reverse.  Also, this is
 // where the two motor controllers on each side are made to act as one, using a
-// mechanism known as "Follow".
+// mechanism known as "Follower".
 void Robot::AutonomousInit()
 {
   m_leftMotorB.Follow(m_leftMotorA);
@@ -99,6 +94,9 @@ void Robot::TeleopPeriodic()
   const bool flag_up = m_controller.GetXButton();
   const bool flag_down = m_controller.GetYButton();
 
+  // This construct is known as a "lambda" -- essentially, a kind of inline function.
+  // The code here adds a deadband to the raw controller inputs, and also shapes them
+  // so that there is more control for slow movement (while still allowing full power).
   auto shape = [](double raw, double mixer = 0.75) -> double
   {
     // Input deadband around 0.0 (+/- range).
